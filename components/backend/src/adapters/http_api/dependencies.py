@@ -3,6 +3,8 @@ from src.application import services
 class Services:
     security: services.SecurityService
 
+def client_stocks_service():
+    return Services.client_stocks
 
 def security_service():
     return Services.security

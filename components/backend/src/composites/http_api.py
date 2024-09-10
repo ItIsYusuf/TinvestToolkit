@@ -20,9 +20,11 @@ class DB:
     async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
     security_repo = repositories.SecurityRepository(async_session_maker=async_session_maker)
+    client_stocks_repo = repositories.ClientStocksRepository(async_session_maker=async_session_maker)
 
 class Application:
     security_service = services.SecurityService(security_repo=DB.security_repo)
+    client_stocks_service = services.ClientStocksService(client_stocks_repo=DB.client_stocks_repo)
 
 def initial_security():
     jwt_strategy.set_secret_key(Settings.http_api.APP_SECRET_KEY)
@@ -30,6 +32,7 @@ def initial_security():
 
 def initial_services():
     Services.security = Application.security_service
+    Services.client_stocks = Application.client_stocks_service
 
 def initial_app():
     initial_security()

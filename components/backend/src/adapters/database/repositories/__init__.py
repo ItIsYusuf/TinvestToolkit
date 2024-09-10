@@ -1,1 +1,2 @@
 from .security import SecurityRepository
+from .client_stocks import ClientStocksRepository

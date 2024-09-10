@@ -15,4 +15,5 @@ def create_app(
         redoc_url='/redoc' if swagger_on else None,
     )
     app.include_router(controllers.security_router)
+    app.include_router(controllers.client_stocks)
     return app
