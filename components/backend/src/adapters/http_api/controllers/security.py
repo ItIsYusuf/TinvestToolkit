@@ -20,8 +20,8 @@ async def login_for_access_token(
         response: Response,
         user: dto.UserLogin = Body(),
 ):
-    await security_service.login_async(user)
-    token = jwt_strategy.create_access_token()
+    user_db = await security_service.login_async(user)
+    token = jwt_strategy.create_access_token(data={"client_id": user_db.id})
     response.set_cookie(key='token', value=token)
 
 
@@ -32,5 +32,6 @@ async def register_for_access_token(
         user: dto.UserRegister = Body()
 ):
     await security_service.register_async(user)
-    token = jwt_strategy.create_access_token()
+    user_db = await security_service.security_repo.get_user(user.email)
+    token = jwt_strategy.create_access_token(data={"client_id": user_db.id})
     response.set_cookie(key='token', value=token)
