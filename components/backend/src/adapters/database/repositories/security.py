@@ -34,3 +34,12 @@ class SecurityRepository(ISecurityRepo):
             _res = await session.execute(query)
 
         return _res.scalar()
+
+    async def get_user_token(self, client_id: int) -> str | None:
+        query = select(entities.Client.token).where(entities.Client.id == client_id)
+
+        async with self.async_session_maker() as session:
+            _res = await session.execute(query)
+            token = _res.scalar()
+
+            return token

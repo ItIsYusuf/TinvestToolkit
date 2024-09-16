@@ -4,6 +4,7 @@ from libs.security import jwt_strategy
 
 from src.adapters import database, http_api, log
 from src.adapters.database import repositories
+from src.adapters.external.tinkoff.tinkoff_api import TinkoffAPI
 from src.adapters.http_api import create_app
 from src.adapters.http_api.dependencies import Services
 from src.application import services
@@ -22,10 +23,16 @@ class DB:
     security_repo = repositories.SecurityRepository(async_session_maker=async_session_maker)
     client_stocks_repo = repositories.ClientStocksRepository(async_session_maker=async_session_maker)
 
+class ExternalAPIs:
+    tinkoff_api = TinkoffAPI(token="")
+
 class Application:
     security_service = services.SecurityService(security_repo=DB.security_repo)
     client_stocks_service = services.ClientStocksService(client_stocks_repo=DB.client_stocks_repo)
-
+    stock_service = services.StockService(
+        security_repo=DB.security_repo,
+        stock_api=ExternalAPIs.tinkoff_api
+    )
 def initial_security():
     jwt_strategy.set_secret_key(Settings.http_api.APP_SECRET_KEY)
     jwt_strategy.set_access_token_expires_minutes(Settings.http_api.APP_TOKEN_EXPIRE_MINUTES)
@@ -33,6 +40,7 @@ def initial_security():
 def initial_services():
     Services.security = Application.security_service
     Services.client_stocks = Application.client_stocks_service
+    Services.stock_service = Application.stock_service
 
 def initial_app():
     initial_security()

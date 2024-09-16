@@ -8,3 +8,6 @@ def client_stocks_service():
 
 def security_service():
     return Services.security
+
+def stock_service():
+    return Services.stock_service

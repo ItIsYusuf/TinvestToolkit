@@ -16,7 +16,6 @@ class SecurityService:
 
         if not Hasher.verify_hash(user.password, user_db.password):
             raise
-
         return user_db
 
     async def register_async(self, user: dto.UserRegister) -> None:

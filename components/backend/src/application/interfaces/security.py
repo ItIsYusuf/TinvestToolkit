@@ -14,3 +14,7 @@ class ISecurityRepo(ABC):
     @abstractmethod
     async def get_user(self, email: str) -> entities.Client | None:
         raise NotImplementedError
+
+    @abstractmethod
+    def get_user_token(self, client_id: int) -> str | None:
+        raise NotImplementedError
