@@ -19,7 +19,10 @@ class SecurityRepository(ISecurityRepo):
         return True if _res.scalar() else False
 
     async def register_async(self, user: dto.UserRegister) -> None:
-        query = insert(entities.Client).values(user.model_dump())
+        user_data = user.model_dump()
+        user_data['role'] = 'user'
+        query = insert(entities.Client).values(user_data
+                                               )
 
         async with self.async_session_maker() as session:
             await session.execute(query)

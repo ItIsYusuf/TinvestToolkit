@@ -59,6 +59,11 @@ clients = Table(
         'token',
         String(1024),
         nullable=False
+    ),
+    Column(
+        'role',
+        String(255),
+        nullable=False
     )
 )
 

@@ -14,3 +14,12 @@ class TinkoffAPI:
                 for share in response.instruments if share.buy_available_flag
             ]
         return stocks
+
+    def get_stocks(self) -> List[Stock]:
+        with Client(self.token) as client:
+            response = client.instruments.shares()
+            stocks = [
+                Stock(ticker=share.ticker, name=share.name)
+                for share in response.instruments
+            ]
+        return stocks

@@ -11,6 +11,7 @@ class Client:
     password: str = None
     email: str = None
     token: str = None
+    role: str = None
 
 @dataclass
 class ClientStocks:

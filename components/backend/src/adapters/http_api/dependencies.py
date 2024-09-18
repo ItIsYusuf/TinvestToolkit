@@ -11,3 +11,6 @@ def security_service():
 
 def stock_service():
     return Services.stock_service
+
+def upd_stock_service():
+    return Services.upd_stock_service
