@@ -8,3 +8,4 @@ attrs==24.2.0
 python-json-logger==2.0.7
 asyncpg==0.29.0
 tinkoff-investments == 0.2.0b105
+croniter==3.0.3

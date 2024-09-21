@@ -20,13 +20,7 @@ class ClientStocksRepository(IClientStocksRepo):
         return True if _res.scalar() else False
 
     async def add_stock_async(self, client_stock: dto.ClientStock) -> None:
-        query = insert(entities.ClientStocks).values(
-            client_id=client_stock.client_id,
-            stock_id=client_stock.stock_id,
-            sell_price=client_stock.sell_price,
-            buy_price=client_stock.buy_price,
-            created_at=client_stock.created_at.replace(tzinfo=None)
-        )
+        query = insert(entities.ClientStocks).values(client_stock.model_dump())
 
         async with self.async_session_maker() as session:
             await session.execute(query)
