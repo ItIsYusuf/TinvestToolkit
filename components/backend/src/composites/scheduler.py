@@ -5,6 +5,7 @@ from libs.scheduler import Settings as SchedulerSettings
 from src.adapters import database, log
 from src.adapters.database import repositories
 from src.application import services
+from src.adapters.external.tinkoff.tinkoff_api import TinkoffAPI
 import time
 import threading
 
@@ -22,10 +23,14 @@ class DB:
     security_repo = repositories.SecurityRepository(async_session_maker=async_session_maker)
 
 
+class ExternalAPIs:
+    tinkoff_api = TinkoffAPI(token="")
+
+
 class Application:
     upd_stock_service = services.UpdStockService(
         security_repo=DB.security_repo,
-        stock_api=DB.upd_stock_repo,
+        stock_api=ExternalAPIs.tinkoff_api,
         upd_stock_repo=DB.upd_stock_repo
     )
 
