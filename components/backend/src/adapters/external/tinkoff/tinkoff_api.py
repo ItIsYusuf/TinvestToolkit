@@ -24,20 +24,25 @@ class TinkoffAPI:
             ]
         return stocks
 
-    def get_stock_price(self, ticker: str) -> StockPrice:
+
+    def add_price_to_stock(self, stock: Stock) -> Stock:
         with Client(self.token) as client:
-            response = client.instruments.find_instrument(query=ticker)
-            if not response.instruments:
-                raise ValueError(f"Stock with '{ticker}' not found")
+            instruments = client.instruments.shares()
+            figi = None
+            for share in instruments.instruments:
+                if share.ticker == stock.ticker:
+                    figi = share.figi
+                    break
+            if not figi:
+                raise ValueError("Stock not found")
 
-            figi = response.instruments[0].figi
-
-            market_data = client.market_data.get_last_prices(
-                figi=[figi]
-            )
-
-            if not market_data.last_prices:
-                raise ValueError(f"Price for stock with FIGI '{figi}' not found")
-
-            last_price = market_data.last_prices[0].price
-            return StockPrice(ticker=ticker, price=last_price.units + last_price.nano /1e9)
+            last_prices = client.market_data.get_last_prices(figi=[figi])
+            if last_prices.last_prices:
+                print(last_prices.last_prices[0])
+                price = (last_prices.last_prices[0].price.units + last_prices.last_prices[0].price.nano / 1e9)
+                print(price)
+                print(type(price))
+                stock.price = price
+                return stock
+            else:
+                raise ValueError("Price not found")

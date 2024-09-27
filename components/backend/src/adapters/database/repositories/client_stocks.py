@@ -1,4 +1,5 @@
 from attr import dataclass
+from typing import List
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from src.application import dto, entities
@@ -25,3 +26,21 @@ class ClientStocksRepository(IClientStocksRepo):
         async with self.async_session_maker() as session:
             await session.execute(query)
             await session.commit()
+
+
+    async def get_stock_by_ticker_async(self, stock_id: int) -> dto.Stock:
+        query = select(entities.Stocks).where(entities.Stocks.id == stock_id)
+
+        async with self.async_session_maker() as session:
+            _res = await session.execute(query)
+            stock_entity = _res.scalar_one_or_none()
+            stock_dto = dto.Stock(ticker=stock_entity.ticker, name=stock_entity.company_name)
+            return stock_dto
+
+
+    async def get_all_client_stocks_async(self) -> List[dto.ClientStock]:
+        query = select(entities.ClientStocks)
+
+        async with self.async_session_maker() as session:
+            result = await session.execute(query)
+            return result.scalars().all()
