@@ -16,6 +16,5 @@ def create_app(
     )
     app.include_router(controllers.security_router)
     app.include_router(controllers.stock_router)
-    app.include_router(controllers.upd_stocks_router)
     app.include_router(controllers.client_stocks)
     return app

@@ -29,16 +29,15 @@ class ExternalAPIs:
 
 class Application:
     security_service = services.SecurityService(security_repo=DB.security_repo)
-    client_stocks_service = services.ClientStocksService(client_stocks_repo=DB.client_stocks_repo)
+    client_stocks_service = services.ClientStocksService(
+        client_stocks_repo=DB.client_stocks_repo,
+        tinkoff_api=ExternalAPIs.tinkoff_api
+    )
     stock_service = services.StockService(
         security_repo=DB.security_repo,
         stock_api=ExternalAPIs.tinkoff_api
     )
-    upd_stock_service = services.UpdStockService(
-        security_repo=DB.security_repo,
-        stock_api=ExternalAPIs.tinkoff_api,
-        upd_stock_repo=DB.upd_stocks_repo
-    )
+
 def initial_security():
     jwt_strategy.set_secret_key(Settings.http_api.APP_SECRET_KEY)
     jwt_strategy.set_access_token_expires_minutes(Settings.http_api.APP_TOKEN_EXPIRE_MINUTES)
@@ -47,7 +46,6 @@ def initial_services():
     Services.security = Application.security_service
     Services.client_stocks = Application.client_stocks_service
     Services.stock_service = Application.stock_service
-    Services.upd_stock_service = Application.upd_stock_service
 
 def initial_app():
     initial_security()

@@ -4,6 +4,7 @@ from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from src.application import dto, entities
 from src.application.interfaces import IClientStocksRepo
+from datetime import timezone
 
 @dataclass
 class ClientStocksRepository(IClientStocksRepo):
@@ -21,6 +22,7 @@ class ClientStocksRepository(IClientStocksRepo):
         return True if _res.scalar() else False
 
     async def add_stock_async(self, client_stock: dto.ClientStock) -> None:
+        client_stock.created_at = client_stock.created_at.replace(tzinfo=None)
         query = insert(entities.ClientStocks).values(client_stock.model_dump())
 
         async with self.async_session_maker() as session:
@@ -44,3 +46,14 @@ class ClientStocksRepository(IClientStocksRepo):
         async with self.async_session_maker() as session:
             result = await session.execute(query)
             return result.scalars().all()
+
+
+    async def get_token_by_client_id(self, client_id: int) -> str:
+        query = select(entities.Client.token).where(entities.Client.id == client_id)
+
+        async with self.async_session_maker() as session:
+            _res = await session.execute(query)
+            token = _res.scalar_one_or_none()
+            if not token:
+                raise ValueError("Token not found")
+            return token

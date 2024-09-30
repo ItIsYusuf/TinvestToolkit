@@ -38,10 +38,8 @@ class TinkoffAPI:
 
             last_prices = client.market_data.get_last_prices(figi=[figi])
             if last_prices.last_prices:
-                print(last_prices.last_prices[0])
                 price = (last_prices.last_prices[0].price.units + last_prices.last_prices[0].price.nano / 1e9)
                 print(price)
-                print(type(price))
                 stock.price = price
                 return stock
             else:

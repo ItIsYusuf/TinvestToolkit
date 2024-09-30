@@ -6,6 +6,7 @@ from src.adapters.external.tinkoff.tinkoff_api import TinkoffAPI
 class ClientStocksService:
     client_stocks_repo: interfaces.IClientStocksRepo
     tinkoff_api: TinkoffAPI
+
     async def add_stock_async(self, client_stock: dto.ClientStock):
         exists = await self.client_stocks_repo.check_stock_async(client_stock)
         if exists:
@@ -21,8 +22,10 @@ class ClientStocksService:
         client_stocks: List[ClientStock] = await self.client_stocks_repo.get_all_client_stocks_async()
 
         for client_stock in client_stocks:
-            stock_dto: Stock = await self.client_stocks_repo.get_stock_by_ticker_async(client_stock.stock_id)
-            stock_with_price = self.tinkoff_api.add_price_to_stock(stock_dto)
-            print(client_stock.sell_price)
+            token = await self.client_stocks_repo.get_token_by_client_id(client_stock.client_id)
+            tinkoff_api = TinkoffAPI(token)
+            stock_dto: dto.Stock = await self.client_stocks_repo.get_stock_by_ticker_async(client_stock.stock_id)
+            stock_with_price = tinkoff_api.add_price_to_stock(stock_dto)
+
             if stock_with_price.price >= client_stock.sell_price:
-                print("It's time to buy this stock")
+                print(f"It's time to sell this stock for client {client_stock.client_id}")

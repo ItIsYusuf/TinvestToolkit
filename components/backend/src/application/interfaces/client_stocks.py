@@ -19,3 +19,7 @@ class IClientStocksRepo(ABC):
     @abstractmethod
     async def get_all_client_stocks_async(self) -> List[dto.Stock]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_token_by_client_id(self) -> str:
+        raise NotImplementedError
