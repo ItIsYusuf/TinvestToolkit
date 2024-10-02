@@ -28,4 +28,8 @@ class ClientStocksService:
             stock_with_price = tinkoff_api.add_price_to_stock(stock_dto)
 
             if stock_with_price.price >= client_stock.sell_price:
-                print(f"It's time to sell this stock for client {client_stock.client_id}")
+                try:
+                    order_id = tinkoff_api.sell_stocks(stock_with_price)
+                    print(f"Sold stock {stock_with_price.ticker}. Order ID: {order_id}")
+                except Exception as e:
+                    print(f"Failed to sell stock {stock_with_price.ticker}: {str(e)}")
