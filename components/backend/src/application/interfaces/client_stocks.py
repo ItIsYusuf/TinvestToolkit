@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 from src.application import dto, entities
-
+from typing import Optional
 class IClientStocksRepo(ABC):
 
     @abstractmethod
@@ -22,4 +22,8 @@ class IClientStocksRepo(ABC):
 
     @abstractmethod
     async def get_token_by_client_id(self) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_email_by_client_id(self, client_id: int) -> Optional[str]:
         raise NotImplementedError

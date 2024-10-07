@@ -1,5 +1,5 @@
 from attr import dataclass
-from typing import List
+from typing import List, Optional
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from src.application import dto, entities
@@ -57,3 +57,10 @@ class ClientStocksRepository(IClientStocksRepo):
             if not token:
                 raise ValueError("Token not found")
             return token
+
+    async def get_email_by_client_id(self, client_id: int) -> Optional[str]:
+        query = select(entities.Client.email).where(entities.Client.id == client_id)
+        async with self.async_session_maker() as session:
+            _res = await session.execute(query)
+            email = _res.scalar_one_or_none()
+            return email

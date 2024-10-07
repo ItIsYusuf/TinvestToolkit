@@ -4,11 +4,13 @@ from src.application import dto, interfaces
 from src.adapters.external.tinkoff.tinkoff_api import TinkoffAPI
 from src.adapters.cache.redis_client import get_redis_client
 
+from src.adapters.email_sender.sender import NotificationMailSender
+
 @dataclass
 class ClientStocksService:
     client_stocks_repo: interfaces.IClientStocksRepo
     tinkoff_api: TinkoffAPI
-
+    notification_sender: NotificationMailSender
     async def add_stock_async(self, client_stock: dto.ClientStock):
         exists = await self.client_stocks_repo.check_stock_async(client_stock)
         if exists:
@@ -41,5 +43,13 @@ class ClientStocksService:
                 try:
                     order_id = tinkoff_api.sell_stocks(stock_with_price)
                     print(f"Sold stock {stock_with_price.ticker}. Order ID: {order_id}")
+                    client_email = await self.client_stocks_repo.get_email_by_client_id(client_stock.client_id)
+                    print(f"{client_email}")
+                    if client_email:
+                        email_message = dto.Event(
+                            txt=f"Stocks {stock_with_price.ticker} was sold",
+                            desc=f"Stock {stock_with_price.name} sold with price {stock_with_price.price}. Order name:"
+                        )
+                        self.notification_sender.send_event(email_message=email_message, emails=[client_email])
                 except Exception as e:
                     print(f"Failed to sell stock {stock_with_price.ticker}: {str(e)}")

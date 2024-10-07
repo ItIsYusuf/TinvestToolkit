@@ -6,6 +6,9 @@ from src.adapters import database, log
 from src.adapters.database import repositories
 from src.application import services
 from src.adapters.external.tinkoff.tinkoff_api import TinkoffAPI
+from src.adapters.email_sender.sender import NotificationMailSender
+from src.adapters.email_sender.settings import Settings as EmailSettings
+
 import time
 import threading
 
@@ -13,6 +16,7 @@ import threading
 class Settings:
     scheduler = SchedulerSettings()
     db = database.Settings()
+    email = EmailSettings()
 
 
 class DB:
@@ -28,6 +32,15 @@ class ExternalAPIs:
     tinkoff_api = TinkoffAPI(token="")
 
 
+class EmailSender:
+    notification_sender = NotificationMailSender(
+        smtp_sender=Settings.email.SMTP_SENDER,
+        smtp_password=Settings.email.SMTP_PASSWORD,
+        smtp_host=Settings.email.SMTP_HOST,
+        smtp_port=Settings.email.SMTP_PORT
+    )
+
+
 class Application:
     upd_stock_service = services.UpdStockService(
         security_repo=DB.security_repo,
@@ -36,7 +49,8 @@ class Application:
     )
     client_stocks_service = services.ClientStocksService(
         client_stocks_repo=DB.client_stocks_repo,
-        tinkoff_api=ExternalAPIs.tinkoff_api
+        tinkoff_api=ExternalAPIs.tinkoff_api,
+        notification_sender=EmailSender.notification_sender
     )
 
 
@@ -48,8 +62,8 @@ class Tasks:
     tasks = [
         AsyncTask(
             name='upd_stocks',
-            cron='0 0 * * *',
-            job=lambda: Application.upd_stock_service.get_stocks(client_id=8)
+            cron='0 0 * * * *',
+            job=lambda: Application.upd_stock_service.get_stocks(client_id=1)
         ),
         AsyncTask(
             name='check_prices',
